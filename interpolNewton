@@ -1,0 +1,75 @@
+#include <iostream>
+#include <cmath>
+#include "stdio.h"
+using namespace std;
+
+const int N = 10;
+
+double testfunc (double x){
+    return pow(x, 2);
+};
+double func7 (double x){
+    return 3*x - cos(x) - 1;
+};
+double func17 (double x){
+    return x*x+1-tan(x);
+};
+
+double suppfunc (double y, int top, double x[N]){
+    double res = 1;
+    for (int i = 0; i < top; i++){
+        res = res * (y - x[i]);
+    }
+    return res;
+};
+double Pn (double y, double C[N], double x[N]){
+    double k = 0;
+    for (int i = 0; i < N; i++){
+        k += C[i] * suppfunc(y, i, x);
+    }
+    return k;
+};
+int main()
+{
+    double x[N], C[N], z[N][N];
+    cout << "Dot X" << endl;
+    for (int i = 0; i < N; i++){
+        x[i] = i*2 - N + 1; // просто так могу
+        cout << x[i] << endl;
+    }
+
+    cout << '\n' << "Matrix Z" << endl;
+
+    for (int i = 0; i < N; i++){
+        z[i][0] = func17(x[i]);      // !!!!!!!!!!!
+    }
+    for (int i = 1; i < N; i++){
+        for (int j = 0; j < N-i; j++){
+            z[j][i] = (z[j+1][i-1] - z[j][i-1]) / (x[j+i] - x[j]);
+        }
+    }
+    for (int i = 0; i < N; i++){
+        for (int j = 0; j < N-i; j++){
+            printf("%10.5f ", z[i][j]);
+            if (j == N-i-1)
+                cout << endl;
+        }
+    }
+
+    cout << '\n' << '\n' << "Constants C" << endl;
+    for (int i = 0; i < N; i++){
+        C[i] = z[0][i];
+        printf("C[%d]: %10.7f\n", i, C[i]);
+    }
+
+    cout << '\n' << endl;
+    double A[N] = {-7, -5, -3.5, -2.7, 0, 2, 3, 5.5, 7.2, 9};
+    double B[N] = {0, 1, 2.5, 3.3, 4.8, 5, 6.1, 7, 8.8, 9};
+    printf("x\t\tfunc(x)\t\tPn(x)\t\tdifference\n");
+    for (int i = 0; i < N; i++){
+        printf("%7.3f\t%15.3f\t%15.3f\t%15.7f\n", A[i], func17(A[i]), Pn(A[i], C, x), abs(func17(A[i]) - Pn(A[i], C, x)));      // !!!!!!!!!!!
+    }
+
+
+    return 0;
+}
